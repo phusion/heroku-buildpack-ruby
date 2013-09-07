@@ -779,7 +779,7 @@ params = CGI.parse(uri.query || "")
   end
 
   def move_into_version_subdir
-    instrument "ruby.move_into_version_subdir do
+    instrument "ruby.move_into_version_subdir" do
       files = list_all_files
       FileUtils.mkdir_p("versions/1")
       if !File.symlink?("versions/current")
