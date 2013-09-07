@@ -95,6 +95,7 @@ class LanguagePack::Ruby < LanguagePack::Base
         install_binaries
         run_assets_precompile_rake_task
       end
+      move_into_version_subdir
       super
     end
   end
@@ -775,5 +776,23 @@ params = CGI.parse(uri.query || "")
       # need to reinstall language pack gems
       install_language_pack_gems
     end
+  end
+
+  def move_into_version_subdir
+    instrument "ruby.move_into_version_subdir do
+      files = list_all_files
+      FileUtils.mkdir_p("versions/1")
+      if !File.symlink?("versions/current")
+        FileUtils.symlink("1", "versions/current")
+      end
+      FileUtils.mv(files, "versions/1")
+      files.each do |name|
+        FileUtils.ln_s("versions/current/#{name}", name)
+      end
+    end
+  end
+
+  def list_all_files
+    Dir["*"] + Dir[".*"] - ["..", ".", "versions"]
   end
 end
