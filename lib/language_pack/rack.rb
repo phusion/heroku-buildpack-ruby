@@ -26,10 +26,8 @@ class LanguagePack::Rack < LanguagePack::Ruby
 
   def default_process_types
     instrument "rack.default_process_types" do
-      # let's special case thin here if we detect it
-      web_process = gem_is_bundled?("thin") ?
-        "bundle exec thin start -R config.ru -e $RACK_ENV -p $PORT" :
-        "bundle exec rackup config.ru -p $PORT"
+      web_process = "passenger start -e $RACK_ENV -p $PORT --max-pool-size 1"
+      web_process = "bundle exec #{web_process}" if gem_is_bundled?("passenger")
 
       super.merge({
         "web" => web_process
